@@ -14,10 +14,18 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
 
 group = 'corse_work'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+
+war { baseName = 'course_work'}
+
+
+war {
+	enabled = true
+}
 
 repositories {
 	mavenCentral()
@@ -28,7 +36,8 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile (group: 'org.modelmapper', name: 'modelmapper', version: '0.3.5')
 	compile('org.springframework.boot:spring-boot-starter-data-rest')
-//	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.boot:spring-boot-starter-security')
+	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.7.0'
 	compile('org.springframework.boot:spring-boot-starter-web')
 	runtime('mysql:mysql-connector-java')
 	compileOnly('org.projectlombok:lombok')

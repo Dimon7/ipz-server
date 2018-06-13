@@ -1,13 +1,9 @@
 package corse_work.demo.model;
 
 
-import corse_work.demo.model.enums.Type;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor

@@ -14,6 +14,7 @@ import corse_work.demo.service.interfaces.TeacherService;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ public class SecretaryController {
     @Resource
     private TeacherService teacherService;
 
+    @PreAuthorize("hasRole('ROLE_SECRETARY') and @accessPermission.canAccessCustomer(authentication , #secretaryId)")
     @RequestMapping(value = "/{secretaryId}", method = RequestMethod.GET )
     @ResponseBody
     public SecretaryDTO getStudent(@PathVariable Long secretaryId) throws AppException{

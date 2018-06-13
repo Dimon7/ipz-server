@@ -12,6 +12,7 @@ import corse_work.demo.service.interfaces.TeacherService;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -38,12 +39,13 @@ public class TeacherController {
 
 
     /*
-     * Request GET /student/{id}
+     * Request GET /ROLE_STUDENT/{id}
      * Response -
      * TODO: getTeacher
      *
      */
 
+    @PreAuthorize("hasRole('ROLE_TEACHER') and @accessPermission.canAccessCustomer(authentication , #teacherId)")
     @RequestMapping(value = "/{teacherId}", method = RequestMethod.GET )
     @ResponseBody
     public TeacherDTO getTeacher(@PathVariable Long teacherId) {

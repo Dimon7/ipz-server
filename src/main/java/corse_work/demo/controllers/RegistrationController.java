@@ -1,9 +1,7 @@
 package corse_work.demo.controllers;
 
-import corse_work.demo.controllers.DTO.RegUserDTO;
-import corse_work.demo.controllers.DTO.SecretaryDTO;
-import corse_work.demo.controllers.DTO.StudentDTO;
-import corse_work.demo.controllers.DTO.TeacherDTO;
+import corse_work.demo.controllers.DTO.*;
+import corse_work.demo.security.JwtTokenProvider;
 import corse_work.demo.controllers.Exceptions.AppException;
 import corse_work.demo.controllers.Exceptions.ExceptionControllerAdvice;
 import corse_work.demo.model.Secretary;
@@ -15,9 +13,10 @@ import corse_work.demo.model.Student;
 import corse_work.demo.model.User;
 import corse_work.demo.model.enums.Role;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,6 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 @Log
-
 @Controller
 @RequestMapping(value = "reg")
 public class RegistrationController {
@@ -40,6 +38,9 @@ public class RegistrationController {
     @Resource
     private PasswordService passwordService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Resource
     private StudentService studentService;
 
@@ -48,6 +49,9 @@ public class RegistrationController {
 
     @Resource
     private SecretaryService secretaryService;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     /**
      *
@@ -59,8 +63,7 @@ public class RegistrationController {
      */
     @RequestMapping(value = "/{user}/registration", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity userRegistration(  @Valid @RequestBody RegUserDTO regUserDTO,
-                                             BindingResult result, @PathVariable String user)throws AppException {
+    public ResponseEntity userRegistration(@Valid @RequestBody RegUserDTO regUserDTO, BindingResult result, @PathVariable String user)throws AppException {
 
         log.info("Registration of user...");
         ExceptionControllerAdvice.CheckValid(result);
@@ -70,28 +73,54 @@ public class RegistrationController {
             throw  new AppException("Email already exist", HttpStatus.BAD_REQUEST);
         }
 
+        if(userService.getUserByName( regUserDTO.getName()).isPresent()){
+            log.info("User with name " + regUserDTO.getName() + " already exist");
+            throw  new AppException("User with name " + regUserDTO.getName() + " already exist", HttpStatus.BAD_REQUEST);
+        }
 
         ModelMapper modelMapper = new ModelMapper();
         User newUser = modelMapper.map(regUserDTO, User.class);
-        newUser.setPassword( passwordService.getHashOfPassword(newUser.getPassword()) );
+        newUser.setPassword( passwordEncoder.encode(newUser.getPassword()) );
 
         if(user.equals("student")){
             Student student = this.student(newUser, regUserDTO);
             StudentDTO DTO = modelMapper.map( student, StudentDTO.class);
-            return ResponseEntity.ok().body( DTO );
+            String token = jwtTokenProvider.createToken( DTO.getUserName(), Role.ROLE_STUDENT);
+            TokenDTO tokenDTO = new TokenDTO();
+            tokenDTO.setToken(token);
+
+            return ResponseEntity.ok().body(
+                    tokenDTO
+            );
         }
 
         if(user.equals("teacher")){
             Teacher teacher = this.teacher(newUser);
             TeacherDTO DTO = modelMapper.map( teacher, TeacherDTO.class);
-            return ResponseEntity.ok().body( DTO );
+
+            String token =  jwtTokenProvider.createToken( DTO.getUserName(), Role.ROLE_TEACHER);
+
+            TokenDTO tokenDTO = new TokenDTO();
+            tokenDTO.setToken(token);
+
+            return ResponseEntity.ok().body(
+                    tokenDTO
+            );
         }
 
         if(user.equals("secretary")){
             Secretary secretary = this.secretary(newUser);
 
             SecretaryDTO DTO = modelMapper.map( secretary, SecretaryDTO.class);
-            return ResponseEntity.ok().body( DTO );
+
+            String token =  jwtTokenProvider.createToken( DTO.getUserName(), Role.ROLE_SECRETARY);
+
+            TokenDTO tokenDTO = new TokenDTO();
+            tokenDTO.setToken(token);
+
+            return ResponseEntity.ok().body(
+                    tokenDTO
+            );
         }
 
         log.info("ERROR");
@@ -99,7 +128,7 @@ public class RegistrationController {
     }
 
     private Secretary secretary(User newUser){
-        newUser.setRole(Role.secretary);
+        newUser.setRole(Role.ROLE_SECRETARY);
 
         newUser=userService.create(newUser);
         Secretary newSecretary = new Secretary();
@@ -109,12 +138,8 @@ public class RegistrationController {
     }
 
     private Student student(User newUser, RegUserDTO regUserDTO){
-        newUser.setRole(Role.student);
-
-
+        newUser.setRole(Role.ROLE_STUDENT);
         newUser=userService.create(newUser);
-
-
 
         Student newStudent = new Student();
         newStudent.setTeam( null );
@@ -128,7 +153,7 @@ public class RegistrationController {
 
     private Teacher teacher(User newUser){
 
-       newUser.setRole(Role.teacher);
+       newUser.setRole(Role.ROLE_TEACHER);
 
        newUser=userService.create(newUser);
 

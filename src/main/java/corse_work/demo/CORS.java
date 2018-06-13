@@ -1,4 +1,3 @@
-
 package corse_work.demo;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
@@ -15,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 @Log
 @Component
 public class CORS implements Filter{
+
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 

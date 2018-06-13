@@ -8,6 +8,7 @@ import corse_work.demo.model.enums.Type;
 import lombok.*;
 
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,13 +17,14 @@ import java.util.Date;
 @NoArgsConstructor
 public class ExamDTO {
 
-    private Long id;
+    @NonNull
+    private String id;
 
-    private Long subjectId;
+    private String subjectId;
 
-    private Long grade;
+    private String grade;
 
-    private Long teamId;
+    private String teamId;
 
     private String StudentUserName;
 
@@ -33,5 +35,8 @@ public class ExamDTO {
     private String date;
 
     private String StudentTeamNumber;
+
+    private Set<String> teams;
+    private Set<String> subjects;
 
 }

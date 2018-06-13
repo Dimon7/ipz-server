@@ -2,8 +2,7 @@ package corse_work.demo.model.enums;
 
 public enum Type {
 
-    test,
-    exam;
+    zalik,  exam;
 
     Type(){}
 }

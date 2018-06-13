@@ -13,7 +13,11 @@ public interface UserService {
     void delete(Long id);
     Boolean exists(String email);
 
-    Optional<User> signIn(String email, String pass);
+    String signIn(String email, String pass);
+
+
+    Optional<User> getUserByEmail(String email);
+    Optional<User> getUserByName(String name);
 
 
 

@@ -12,6 +12,7 @@ public interface TeamService {
     Team update(Team t);
     List<Team> getAll();
     Team getById(Long id) throws AppException;
+    Team getTeamByNumer(String number);
 
 
     void delete(Long id);

@@ -12,11 +12,10 @@ import org.hibernate.validator.constraints.NotEmpty;
 @ToString
 public class EnterDTO {
 
-
     private String password;
 
     private String email;
 
-    private Role role;
+    private String role;
 
 }

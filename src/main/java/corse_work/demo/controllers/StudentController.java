@@ -11,7 +11,9 @@ import corse_work.demo.service.interfaces.TeamService;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -42,7 +44,7 @@ public class StudentController {
 
 
     /*
-     * Request GET /student/{id}
+     * Request GET /ROLE_STUDENT/{id}
      * Response -
      * TODO: getStudent
      *
@@ -50,6 +52,9 @@ public class StudentController {
 
     @RequestMapping(value = "/{studentId}", method = RequestMethod.GET )
     @ResponseBody
+
+    @PreAuthorize("hasRole('ROLE_STUDENT') and @accessPermission.canAccessCustomer(authentication , #studentId)")
+
     public StudentDTO getStudent(@PathVariable Long studentId) throws AppException {
 
 
@@ -57,13 +62,13 @@ public class StudentController {
 
         Student student = studentService.getById(studentId);
 
-
         ModelMapper modelMapper = new ModelMapper();
 
         return modelMapper.map(student, StudentDTO.class);
 
     }
 
+    @PreAuthorize("hasRole('ROLE_SECRETARY')")
     @RequestMapping(value = "/getAll", method = RequestMethod.GET )
     @ResponseBody
     public ResponseEntity getAllStudent() {
@@ -84,16 +89,14 @@ public class StudentController {
 
     }
 
-
-    @RequestMapping(value = "/edit", method = RequestMethod.PUT)
+    @PreAuthorize("hasRole('ROLE_SECRETARY')")
+    @RequestMapping(value = "/edit", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public ResponseEntity editStudent(@RequestBody EditStudentDTO editStudentDTO, BindingResult result) throws AppException {
+    public ResponseEntity editStudent(@RequestBody EditStudentDTO editStudentDTO) throws AppException {
 
         log.info("edit Student");
 
-        System.out.println( editStudentDTO.toString() );
-
-        List<Long> ids = editStudentDTO.getIds();
+        List<String> ids = editStudentDTO.getIds();
         List<StudentDTO> studentsDTO = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
 
@@ -102,9 +105,9 @@ public class StudentController {
 
         Optional<List<Exam>> exams = examService.getExamsByTeam( team );
 
-        for( Long i: ids) {
+        for( String i: ids) {
 
-            Student student = studentService.getById(i);
+            Student student = studentService.getById(Long.parseLong(i));
 
             //TODO: shit
             if(exams.isPresent()) {
@@ -128,9 +131,7 @@ public class StudentController {
             studentsDTO.add( modelMapper.map( newStudent, StudentDTO.class ) );
         }
 
-
-
-        return ResponseEntity.ok().body( studentsDTO );
+        return ResponseEntity.ok().body(studentsDTO);
     }
 
 }

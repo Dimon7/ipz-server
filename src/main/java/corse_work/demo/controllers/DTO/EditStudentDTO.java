@@ -17,7 +17,7 @@ public class EditStudentDTO {
 
 
     @NonNull
-    private List<Long> ids;
+    private List<String> ids;
 
     private Long idteam;
 

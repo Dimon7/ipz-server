@@ -56,6 +56,11 @@ public class TeamController {
 
         Team team = modelMapper.map(teamDTO, Team.class);
 
+        if( teamService.getTeamByNumer(team.getNumber()) != null ){
+            log.info(team.getNumber() + " team already exist");
+            throw new AppException(team.getNumber() + " team already exist");
+        }
+
         Team newTeam =  teamService.create(team);
 
         return ResponseEntity.ok().body( modelMapper.map(newTeam, TeamDTO.class) );

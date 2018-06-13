@@ -1,10 +1,7 @@
 package corse_work.demo.service.impl;
 
 import corse_work.demo.controllers.Exceptions.AppException;
-import corse_work.demo.model.Exam;
-import corse_work.demo.model.Student;
-import corse_work.demo.model.Teacher;
-import corse_work.demo.model.Team;
+import corse_work.demo.model.*;
 import corse_work.demo.model.repository.ExamRepository;
 import corse_work.demo.service.interfaces.ExamService;
 import lombok.extern.java.Log;
@@ -52,6 +49,17 @@ public class ExamServiceImpl implements ExamService {
 
         return  exams;
 
+    }
+
+    @Override
+    public Optional<List<Exam>> getExamsBySubject(Subject sb) {
+
+        return examRepository.getExamsBySubject(sb);
+    }
+
+    @Override
+    public Optional<List<Exam>> getExamsByTeamAndSubject(Subject sb, Team t) {
+        return examRepository.getExamsByTeamAndSubject(sb, t);
     }
 
     @Override

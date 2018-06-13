@@ -1,10 +1,12 @@
 package corse_work.demo.model.enums;
 
-public enum Role {
+import org.springframework.security.core.GrantedAuthority;
 
-    teacher,
-    student,
-    secretary;
+public enum Role implements GrantedAuthority{
 
-    Role(){}
+    ROLE_TEACHER, ROLE_STUDENT, ROLE_SECRETARY;
+
+    public String getAuthority() {
+        return name();
+    }
 }

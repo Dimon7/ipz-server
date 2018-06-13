@@ -35,7 +35,7 @@ public class StudentServiceImpl implements StudentService {
         Optional<Student> student =  studentRepository.findById(id);
 
         if(!student.isPresent()){
-            String error = "There is no student with id=" + id;
+            String error = "There is no ROLE_STUDENT with id=" + id;
             log.info(error);
             throw new AppException(error);
         }
